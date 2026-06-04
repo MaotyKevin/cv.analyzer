@@ -41,3 +41,10 @@ htmlcov/
 # Static / media uploads
 staticfiles/
 media/
+
+# Frontend / Vite
+cvmatch-frontend/node_modules/
+cvmatch-frontend/dist/
+cvmatch-frontend/dist-ssr/
+cvmatch-frontend/*.local
+cvmatch-frontend/.vite/

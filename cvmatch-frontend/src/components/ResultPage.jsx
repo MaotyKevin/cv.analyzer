@@ -1,0 +1,164 @@
+import { useState } from "react";
+
+export default function ResultPage({ result, onReset }) {
+  const [copied, setCopied] = useState(false);
+
+  const copyCV = () => {
+    navigator.clipboard.writeText(result.optimized_cv);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const scoreColor =
+    result.score >= 70 ? "#22c55e" : result.score >= 50 ? "#f59e0b" : "#ef4444";
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.card}>
+
+        {/* Score */}
+        <div style={styles.scoreBox}>
+          <p style={styles.scoreLabel}>Match Score</p>
+          <p style={{ ...styles.scoreNumber, color: scoreColor }}>{result.score}</p>
+          <p style={styles.scoreSubtext}>out of 100</p>
+        </div>
+
+        {/* Strengths */}
+        <Section title="Strengths" items={result.strengths} color="#22c55e" />
+
+        {/* Weaknesses */}
+        <Section title="Weaknesses" items={result.weaknesses} color="#ef4444" />
+
+        {/* Missing Keywords */}
+        <Section title="Missing Keywords" items={result.missing_keywords} color="#f59e0b" />
+
+        {/* Improvements */}
+        <Section title="Improvements" items={result.improvements} color="#4f46e5" />
+
+        {/* Optimized CV */}
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>Optimized CV</h2>
+          <pre style={styles.cvBox}>{result.optimized_cv}</pre>
+          <button onClick={copyCV} style={styles.copyButton}>
+            {copied ? "Copied!" : "Copy Optimized CV"}
+          </button>
+        </div>
+
+        {/* Try Again */}
+        <button onClick={onReset} style={styles.resetButton}>
+          ← Analyze Another CV
+        </button>
+
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, items, color }) {
+  return (
+    <div style={styles.section}>
+      <h2 style={styles.sectionTitle}>{title}</h2>
+      <ul style={styles.list}>
+        {items.map((item, i) => (
+          <li key={i} style={{ ...styles.listItem, borderLeft: `3px solid ${color}` }}>
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "#f4f6f9",
+    display: "flex",
+    justifyContent: "center",
+    padding: "2rem",
+  },
+  card: {
+    background: "#fff",
+    borderRadius: "12px",
+    padding: "2.5rem",
+    width: "100%",
+    maxWidth: "720px",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+    height: "fit-content",
+  },
+  scoreBox: {
+    textAlign: "center",
+    marginBottom: "2rem",
+    padding: "1.5rem",
+    background: "#f8f9ff",
+    borderRadius: "12px",
+  },
+  scoreLabel: {
+    fontSize: "0.9rem",
+    color: "#666",
+    marginBottom: "0.25rem",
+  },
+  scoreNumber: {
+    fontSize: "4rem",
+    fontWeight: "800",
+    margin: "0",
+  },
+  scoreSubtext: {
+    fontSize: "0.85rem",
+    color: "#999",
+  },
+  section: {
+    marginBottom: "2rem",
+  },
+  sectionTitle: {
+    fontSize: "1.1rem",
+    fontWeight: "700",
+    marginBottom: "0.75rem",
+    color: "#1a1a2e",
+  },
+  list: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+  },
+  listItem: {
+    padding: "0.6rem 0.75rem",
+    marginBottom: "0.5rem",
+    background: "#f8f9ff",
+    borderRadius: "6px",
+    fontSize: "0.9rem",
+    color: "#333",
+  },
+  cvBox: {
+    background: "#f8f9ff",
+    padding: "1rem",
+    borderRadius: "8px",
+    fontSize: "0.85rem",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    color: "#333",
+    maxHeight: "400px",
+    overflowY: "auto",
+  },
+  copyButton: {
+    marginTop: "0.75rem",
+    padding: "0.6rem 1.2rem",
+    background: "#4f46e5",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    fontSize: "0.9rem",
+  },
+  resetButton: {
+    width: "100%",
+    padding: "0.8rem",
+    background: "transparent",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    cursor: "pointer",
+    color: "#666",
+    fontSize: "0.95rem",
+  },
+};
