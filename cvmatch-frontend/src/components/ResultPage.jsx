@@ -1,4 +1,5 @@
 import { useState } from "react";
+import jsPDF from "jspdf";
 
 export default function ResultPage({ result, onReset }) {
   const [copied, setCopied] = useState(false);
@@ -7,6 +8,60 @@ export default function ResultPage({ result, onReset }) {
     navigator.clipboard.writeText(result.optimized_cv);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    const margin = 15;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - margin * 2;
+    const lineHeight = 7;
+    let y = 20;
+
+    const addText = (text, fontSize = 11, isBold = false) => {
+      doc.setFontSize(fontSize);
+      doc.setFont("helvetica", isBold ? "bold" : "normal");
+      const lines = doc.splitTextToSize(text, maxWidth);
+      lines.forEach((line) => {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+    };
+
+    const addSection = (title, items) => {
+      y += 4;
+      addText(title, 13, true);
+      y += 2;
+      items.forEach((item) => {
+        addText(`• ${item}`, 10);
+      });
+    };
+
+    // Title
+    addText("CV Match Analysis Report", 18, true);
+    y += 4;
+
+    // Score
+    addText(`Match Score: ${result.score} / 100`, 14, true);
+    y += 2;
+
+    // Sections
+    addSection("Strengths", result.strengths);
+    addSection("Weaknesses", result.weaknesses);
+    addSection("Missing Keywords", result.missing_keywords);
+    addSection("Improvements", result.improvements);
+
+    // Optimized CV
+    y += 4;
+    addText("Optimized CV", 13, true);
+    y += 2;
+    addText(result.optimized_cv, 10);
+
+    doc.save("optimized-cv.pdf");
   };
 
   const scoreColor =
@@ -24,24 +79,30 @@ export default function ResultPage({ result, onReset }) {
         </div>
 
         {/* Strengths */}
-        <Section title="Strengths" items={result.strengths} color="#22c55e" />
+        <Section title="✅ Strengths" items={result.strengths} color="#22c55e" />
 
         {/* Weaknesses */}
-        <Section title="Weaknesses" items={result.weaknesses} color="#ef4444" />
+        <Section title="⚠️ Weaknesses" items={result.weaknesses} color="#ef4444" />
 
         {/* Missing Keywords */}
-        <Section title="Missing Keywords" items={result.missing_keywords} color="#f59e0b" />
+        <Section title="🔍 Missing Keywords" items={result.missing_keywords} color="#f59e0b" />
 
         {/* Improvements */}
-        <Section title="Improvements" items={result.improvements} color="#4f46e5" />
+        <Section title="📈 Improvements" items={result.improvements} color="#4f46e5" />
 
         {/* Optimized CV */}
         <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>Optimized CV</h2>
+          <h2 style={styles.sectionTitle}>🚀 Optimized CV</h2>
           <pre style={styles.cvBox}>{result.optimized_cv}</pre>
-          <button onClick={copyCV} style={styles.copyButton}>
-            {copied ? "Copied!" : "Copy Optimized CV"}
-          </button>
+
+          <div style={styles.buttonRow}>
+            <button onClick={copyCV} style={styles.copyButton}>
+              {copied ? "✅ Copied!" : "Copy Optimized CV"}
+            </button>
+            <button onClick={downloadPDF} style={styles.pdfButton}>
+              ⬇️ Download PDF
+            </button>
+          </div>
         </div>
 
         {/* Try Again */}
@@ -140,10 +201,26 @@ const styles = {
     maxHeight: "400px",
     overflowY: "auto",
   },
-  copyButton: {
+  buttonRow: {
+    display: "flex",
+    gap: "0.75rem",
     marginTop: "0.75rem",
+  },
+  copyButton: {
+    flex: 1,
     padding: "0.6rem 1.2rem",
     background: "#4f46e5",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "600",
+    fontSize: "0.9rem",
+  },
+  pdfButton: {
+    flex: 1,
+    padding: "0.6rem 1.2rem",
+    background: "#0f172a",
     color: "#fff",
     border: "none",
     borderRadius: "6px",
