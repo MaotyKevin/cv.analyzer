@@ -1,0 +1,31 @@
+JOB DESCRIPTION (Intern / Junior Web Developer)
+
+Job Title: Junior Web Developer Intern
+
+Location: Remote / Office (depending on company)
+Type: Internship / Entry-level
+
+JOB SUMMARY
+
+We are looking for a motivated beginner developer to join our team. The candidate will help build and maintain simple web applications while learning modern development practices.
+
+RESPONSIBILITIES
+Assist in building simple web pages using HTML, CSS, JavaScript
+Fix small bugs in existing code
+Help update website content
+Work with senior developers to learn best practices
+Participate in basic project tasks and documentation
+REQUIREMENTS
+Basic knowledge of HTML, CSS, JavaScript
+Willingness to learn and improve
+Basic understanding of Git/GitHub is a plus
+No prior experience required
+Good attitude and motivation
+NICE TO HAVE
+Personal projects (even small ones)
+Basic Python or frontend framework knowledge
+Understanding of responsive design
+BENEFITS
+Real project experience
+Mentorship from senior developers
+Opportunity for future full-time role

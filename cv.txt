@@ -1,0 +1,41 @@
+Name: Kevin Maoty
+Phone: 034 xx xxx xx
+Email: kevinmaoty@email.com
+
+ABOUT ME
+
+I am a young developer student, I like computer and internet. I try to learn web development and programming. I don’t have much experience but I can learn fast and I like to work in team sometimes.
+
+EDUCATION
+
+2019 - 2023 : High school diploma (BAC)
+School: Lycée Antsirabe
+
+2023 - now : Computer science student (not finished yet)
+University: (not sure name)
+
+SKILLS
+HTML a little bit
+CSS basic
+JavaScript beginner
+Python I tried few projects
+GitHub account (but not many projects)
+EXPERIENCE
+
+No real job experience yet but I did some small practice:
+
+small website portfolio (not finished)
+calculator project
+todo list (not fully working)
+LANGUAGES
+Malagasy (native)
+French (medium)
+English (basic)
+HOBBIES
+coding sometimes
+watching youtube tutorials
+playing games
+learning new things but not always consistent
+OTHER
+
+I want internship or first job to improve my skills and learn more in real environment.
