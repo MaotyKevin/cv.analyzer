@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from . import views
+from . import views, stripe_views
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -8,6 +8,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', views.me, name='me'),
     path('analyze-cv/', views.analyze_cv, name='analyze_cv'),
-    path('create-checkout-session/', views.create_checkout_session, name='checkout'),
-    path('webhook/', views.stripe_webhook, name='webhook'),
+    path('create-checkout-session/', stripe_views.create_checkout_session, name='checkout'),
+    path('webhook/', stripe_views.stripe_webhook, name='webhook'),
 ]
