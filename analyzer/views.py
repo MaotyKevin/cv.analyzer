@@ -1,12 +1,18 @@
 import os
 import json
+import requests
 from pathlib import Path
 from google import genai
 from google.genai import types
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.models import User
+from django.db import transaction
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from dotenv import load_dotenv
+from .models import UserProfile
 
 load_dotenv()
 
@@ -25,6 +31,16 @@ def analyze_cv(request):
             {'error': 'Both cv and job_description are required.'},
             status=status.HTTP_400_BAD_REQUEST
         )
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+        # Usage gate
+    if profile.has_reached_limit():
+        return Response({
+            'error': 'limit_reached',
+            'message': 'You have used all your free analyses.',
+            'analyses_used': profile.analyses_used,
+            'free_limit': UserProfile.FREE_LIMIT,
+        }, status=status.HTTP_403_FORBIDDEN)
 
     try:
         user_message = f"CV:\n{cv}\n\nJob Description:\n{job_description}"
@@ -46,6 +62,16 @@ def analyze_cv(request):
                 raw = raw[4:]
 
         result = json.loads(raw)
+
+        # Increment usage only on success
+        with transaction.atomic():
+            profile.analyses_used += 1
+            profile.save()
+
+        result['analyses_used'] = profile.analyses_used
+        result['free_limit'] = UserProfile.FREE_LIMIT
+        result['is_paid'] = profile.is_paid
+
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
@@ -58,3 +84,39 @@ def analyze_cv(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+# ── Auth endpoints ──────────────────────────────────────────────
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    username = request.data.get('username', '').strip()
+    email = request.data.get('email', '').strip()
+    password = request.data.get('password', '').strip()
+
+    if not username or not password:
+        return Response({'error': 'Username and password are required.'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if User.objects.filter(username=username).exists():
+        return Response({'error': 'Username already taken.'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.create_user(username=username, email=email, password=password)
+    UserProfile.objects.create(user=user)
+
+    return Response({'message': 'Account created successfully.'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def me(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    return Response({
+        'username': request.user.username,
+        'email': request.user.email,
+        'analyses_used': profile.analyses_used,
+        'free_limit': UserProfile.FREE_LIMIT,
+        'is_paid': profile.is_paid,
+        'has_reached_limit': profile.has_reached_limit(),
+    })
