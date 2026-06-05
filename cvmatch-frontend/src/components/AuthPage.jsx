@@ -1,6 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
-import { API_BASE_URL } from "../config/env";
+import api from "../api/axios";
 import "../styles/components/AuthPage.css";
 
 export default function AuthPage({ onLogin }) {
@@ -17,12 +16,12 @@ export default function AuthPage({ onLogin }) {
     setError(null);
     try {
       if (mode === "register") {
-        await axios.post(`${API_BASE_URL}/register/`, form);
+        await api.post(`/register/`, form);
         setMode("login");
         setError(null);
         return;
       }
-      const res = await axios.post(`${API_BASE_URL}/login/`, {
+      const res = await api.post(`/login/`, {
         username: form.username,
         password: form.password,
       });

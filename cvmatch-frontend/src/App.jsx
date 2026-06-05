@@ -3,51 +3,24 @@ import axios from "axios";
 import InputForm from "./components/InputForm";
 import ResultPage from "./components/ResultPage";
 import AuthPage from "./components/AuthPage";
-import { API_BASE_URL, AUTH_TOKEN_STORAGE_KEY } from "./config/env";
+import api from "./api/axios";
+import useAuth from "./hooks/useAuth";
 
 export default function App() {
-  const [token, setToken] = useState(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) || null);
-  const [user, setUser] = useState(null);
+  const { token, user, setUser, login, logout } = useAuth();
+  // keep local setters for compatibility
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (token) fetchUser();
-  }, [token]);
-
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/me/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(res.data);
-    } catch {
-      logout();
-    }
-  };
-
-  const login = (accessToken) => {
-    localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, accessToken);
-    setToken(accessToken);
-  };
-
-  const logout = () => {
-    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-    setToken(null);
-    setUser(null);
-    setResult(null);
-  };
+  // App-level logout should also clear result state
+  const appLogout = () => { logout(); setResult(null); };
 
   const analyzeCV = async (cv, jobDescription) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(
-        `${API_BASE_URL}/analyze-cv/`,
-        { cv, job_description: jobDescription },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post(`/analyze-cv/`, { cv, job_description: jobDescription });
       setResult(res.data);
       setUser((u) => ({ ...u, analyses_used: res.data.analyses_used }));
     } catch (err) {

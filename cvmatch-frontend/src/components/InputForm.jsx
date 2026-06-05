@@ -35,8 +35,7 @@ export default function InputForm({ onSubmit, loading, error, user, onLogout }) 
         <div className="input-hero">
           <h1 className="input-title">Know exactly how your CV performs</h1>
           <p className="input-subtitle">
-            Paste your CV and a job description. Get an instant match score,
-            a gap analysis, and a tailored rewrite — ready to submit.
+            Paste your CV and a job description. Get an instant match score, a gap analysis, and a tailored rewrite — ready to submit.
           </p>
         </div>
 
