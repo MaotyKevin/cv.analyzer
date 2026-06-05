@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import InputForm from "./components/InputForm";
 import ResultPage from "./components/ResultPage";
 import AuthPage from "./components/AuthPage";
