@@ -1,4 +1,5 @@
 import "../styles/components/InputForm.css";
+import api from "../api/axios";
 
 export default function InputForm({ onSubmit, loading, error, user, onLogout }) {
   const handleSubmit = (e) => {
@@ -8,7 +9,16 @@ export default function InputForm({ onSubmit, loading, error, user, onLogout }) 
     if (cv && jobDescription) onSubmit(cv, jobDescription);
   };
 
-  const remaining = user ? user.free_limit - user.analyses_used : null;
+  const handleUpgrade = async () => {
+    try {
+      const res = await api.post("/create-checkout-session/");
+      window.location.href = res.data.url;
+    } catch (err) {
+      console.error("Checkout error:", err);
+    }
+  };
+
+  const remaining = user?.is_paid ? "Unlimited" : user ? user.free_limit - user.analyses_used : null;
 
   return (
     <div className="input-page">
@@ -24,7 +34,7 @@ export default function InputForm({ onSubmit, loading, error, user, onLogout }) 
           {user && (
             <div className="input-status-right">
               <span className="input-usage-pill">
-                {remaining} free {remaining === 1 ? "analysis" : "analyses"} remaining
+                {user?.is_paid ? "Unlimited analyses" : `${remaining} free ${remaining === 1 ? "analysis" : "analyses"} remaining`}
               </span>
               <span className="input-username">{user.username}</span>
               <button onClick={onLogout} className="input-logout-button">Sign out</button>
@@ -46,8 +56,8 @@ export default function InputForm({ onSubmit, loading, error, user, onLogout }) 
               <p className="input-upgrade-text">
                 Upgrade to continue analyzing and optimizing CVs without limits.
               </p>
-              <button className="input-upgrade-button">
-                Upgrade — coming soon
+              <button className="input-upgrade-button" onClick={handleUpgrade}>
+                Upgrade — $5 one-time
               </button>
             </div>
           </div>

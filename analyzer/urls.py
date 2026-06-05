@@ -8,4 +8,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', views.me, name='me'),
     path('analyze-cv/', views.analyze_cv, name='analyze_cv'),
+    path('create-checkout-session/', views.create_checkout_session, name='checkout'),
+    path('webhook/', views.stripe_webhook, name='webhook'),
 ]
