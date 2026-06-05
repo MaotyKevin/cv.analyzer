@@ -1,4 +1,4 @@
-export default function InputForm({ onSubmit, loading, error }) {
+export default function InputForm({ onSubmit, loading, error, user, onLogout }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const cv = e.target.cv.value.trim();
@@ -6,13 +6,28 @@ export default function InputForm({ onSubmit, loading, error }) {
     if (cv && jobDescription) onSubmit(cv, jobDescription);
   };
 
+  const remaining = user ? user.free_limit - user.analyses_used : null;
+
   return (
     <div style={styles.page}>
       <div style={styles.wrapper}>
 
-        <div style={styles.header}>
-          <div style={styles.logoMark} />
-          <span style={styles.logoText}>CVMatch</span>
+        {/* Top bar */}
+        <div style={styles.topBar}>
+          <div style={styles.header}>
+            <div style={styles.logoMark} />
+            <span style={styles.logoText}>CVMatch</span>
+          </div>
+
+          {user && (
+            <div style={styles.statusRight}>
+              <span style={styles.usagePill}>
+                {remaining} free {remaining === 1 ? "analysis" : "analyses"} remaining
+              </span>
+              <span style={styles.username}>{user.username}</span>
+              <button onClick={onLogout} style={styles.logoutButton}>Sign out</button>
+            </div>
+          )}
         </div>
 
         <div style={styles.hero}>
@@ -23,41 +38,59 @@ export default function InputForm({ onSubmit, loading, error }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.row}>
-            <div style={styles.field}>
-              <label style={styles.label}>Your CV</label>
-              <textarea
-                name="cv"
-                placeholder="Paste your CV here..."
-                style={styles.textarea}
-                required
-              />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label}>Job Description</label>
-              <textarea
-                name="jobDescription"
-                placeholder="Paste the job description here..."
-                style={styles.textarea}
-                required
-              />
+        {error === "limit_reached" ? (
+          <div style={styles.upgradeBox}>
+            <div style={styles.upgradeInner}>
+              <p style={styles.upgradeTitle}>You have used all {user?.free_limit} free analyses</p>
+              <p style={styles.upgradeText}>
+                Upgrade to continue analyzing and optimizing CVs without limits.
+              </p>
+              <button style={styles.upgradeButton}>
+                Upgrade — coming soon
+              </button>
             </div>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={styles.form}>
+            <div style={styles.row}>
+              <div style={styles.field}>
+                <label style={styles.label}>Your CV</label>
+                <textarea
+                  name="cv"
+                  placeholder="Paste your CV here..."
+                  style={styles.textarea}
+                  required
+                />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Job Description</label>
+                <textarea
+                  name="jobDescription"
+                  placeholder="Paste the job description here..."
+                  style={styles.textarea}
+                  required
+                />
+              </div>
+            </div>
 
-          {error && <p style={styles.error}>{error}</p>}
+            {error && <p style={styles.error}>{error}</p>}
 
-          <button type="submit" style={loading ? { ...styles.button, ...styles.buttonDisabled } : styles.button} disabled={loading}>
-            {loading ? (
-              <span style={styles.buttonInner}>
-                <span style={styles.spinner} />
-                Analyzing...
-              </span>
-            ) : (
-              "Analyze CV"
-            )}
-          </button>
-        </form>
+            <button
+              type="submit"
+              style={loading ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
+              disabled={loading}
+            >
+              {loading ? (
+                <span style={styles.buttonInner}>
+                  <span style={styles.spinner} />
+                  Analyzing...
+                </span>
+              ) : (
+                "Analyze CV"
+              )}
+            </button>
+          </form>
+        )}
 
         <div style={styles.trust}>
           <span style={styles.trustItem}>Instant analysis</span>
@@ -92,7 +125,7 @@ export default function InputForm({ onSubmit, loading, error }) {
         }
 
         button:hover:not(:disabled) {
-          background: #2D2B4E !important;
+          opacity: 0.85;
         }
 
         @keyframes spin {
@@ -121,11 +154,18 @@ const styles = {
     width: "100%",
     maxWidth: "900px",
   },
+  topBar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: "3rem",
+    flexWrap: "wrap",
+    gap: "1rem",
+  },
   header: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    marginBottom: "3rem",
   },
   logoMark: {
     width: "28px",
@@ -138,6 +178,36 @@ const styles = {
     fontWeight: "600",
     color: "#1A1A2E",
     letterSpacing: "-0.02em",
+  },
+  statusRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    flexWrap: "wrap",
+  },
+  usagePill: {
+    fontSize: "0.8125rem",
+    color: "#6B6966",
+    background: "#F0EFF9",
+    padding: "0.3rem 0.75rem",
+    borderRadius: "20px",
+    fontWeight: "500",
+  },
+  username: {
+    fontSize: "0.875rem",
+    color: "#3A3835",
+    fontWeight: "500",
+  },
+  logoutButton: {
+    fontSize: "0.8125rem",
+    color: "#6B6966",
+    background: "transparent",
+    border: "1px solid #E8E6E1",
+    borderRadius: "6px",
+    padding: "0.3rem 0.75rem",
+    cursor: "pointer",
+    fontFamily: "'Sora', sans-serif",
+    transition: "opacity 0.15s",
   },
   hero: {
     marginBottom: "2.5rem",
@@ -208,7 +278,7 @@ const styles = {
     cursor: "pointer",
     fontFamily: "'Sora', sans-serif",
     letterSpacing: "-0.01em",
-    transition: "background 0.15s",
+    transition: "opacity 0.15s",
   },
   buttonDisabled: {
     background: "#9490A8",
@@ -237,6 +307,45 @@ const styles = {
     background: "#FDF2F2",
     borderRadius: "8px",
     border: "1px solid #F5C6C6",
+  },
+  upgradeBox: {
+    background: "#fff",
+    border: "1px solid #E8E6E1",
+    borderRadius: "16px",
+    padding: "3rem 2rem",
+    marginBottom: "1.5rem",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  upgradeInner: {
+    textAlign: "center",
+    maxWidth: "380px",
+  },
+  upgradeTitle: {
+    fontSize: "1.125rem",
+    fontWeight: "600",
+    color: "#1A1A2E",
+    letterSpacing: "-0.02em",
+    marginBottom: "0.625rem",
+  },
+  upgradeText: {
+    fontSize: "0.9rem",
+    color: "#6B6966",
+    lineHeight: "1.6",
+    marginBottom: "1.75rem",
+  },
+  upgradeButton: {
+    padding: "0.8rem 2rem",
+    background: "#1A1A2E",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "0.9rem",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontFamily: "'Sora', sans-serif",
+    transition: "opacity 0.15s",
   },
   trust: {
     display: "flex",
