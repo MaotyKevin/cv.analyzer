@@ -3,11 +3,10 @@ import axios from "axios";
 import InputForm from "./components/InputForm";
 import ResultPage from "./components/ResultPage";
 import AuthPage from "./components/AuthPage";
-
-const API = "http://127.0.0.1:8000/api";
+import { API_BASE_URL, AUTH_TOKEN_STORAGE_KEY } from "./config/env";
 
 export default function App() {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) || null);
   const [user, setUser] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -19,7 +18,7 @@ export default function App() {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get(`${API}/me/`, {
+      const res = await axios.get(`${API_BASE_URL}/me/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(res.data);
@@ -29,12 +28,12 @@ export default function App() {
   };
 
   const login = (accessToken) => {
-    localStorage.setItem("token", accessToken);
+    localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, accessToken);
     setToken(accessToken);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
     setToken(null);
     setUser(null);
     setResult(null);
@@ -45,7 +44,7 @@ export default function App() {
     setError(null);
     try {
       const res = await axios.post(
-        `${API}/analyze-cv/`,
+        `${API_BASE_URL}/analyze-cv/`,
         { cv, job_description: jobDescription },
         { headers: { Authorization: `Bearer ${token}` } }
       );

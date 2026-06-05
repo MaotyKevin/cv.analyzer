@@ -1,7 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
-const API = "http://127.0.0.1:8000/api";
+import { API_BASE_URL } from "../config/env";
 
 export default function AuthPage({ onLogin }) {
   const [mode, setMode] = useState("login");
@@ -17,12 +16,12 @@ export default function AuthPage({ onLogin }) {
     setError(null);
     try {
       if (mode === "register") {
-        await axios.post(`${API}/register/`, form);
+        await axios.post(`${API_BASE_URL}/register/`, form);
         setMode("login");
         setError(null);
         return;
       }
-      const res = await axios.post(`${API}/login/`, {
+      const res = await axios.post(`${API_BASE_URL}/login/`, {
         username: form.username,
         password: form.password,
       });
