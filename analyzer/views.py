@@ -23,6 +23,7 @@ SYSTEM_PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "system_promp
 SYSTEM_PROMPT = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8").strip()
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def analyze_cv(request):
     cv = request.data.get('cv', '').strip()
     job_description = request.data.get('job_description', '').strip()
@@ -32,9 +33,10 @@ def analyze_cv(request):
             {'error': 'Both cv and job_description are required.'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-        # Usage gate
+    # Usage gate
     if profile.has_reached_limit():
         return Response({
             'error': 'limit_reached',
@@ -56,7 +58,6 @@ def analyze_cv(request):
 
         raw = response.text.strip()
 
-        # Strip markdown fences if present
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -64,7 +65,6 @@ def analyze_cv(request):
 
         result = json.loads(raw)
 
-        # Increment usage only on success
         with transaction.atomic():
             profile.analyses_used += 1
             profile.save()
