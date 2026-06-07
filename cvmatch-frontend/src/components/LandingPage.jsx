@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import "../styles/components/LandingPage.css";
+import ScoreCard from "./ScoreCard";
 
 export default function LandingPage({ onGetStarted }) {
   const heroRef = useRef(null);
@@ -39,48 +40,35 @@ export default function LandingPage({ onGetStarted }) {
       {/* Hero */}
       <section className="lp-hero" ref={heroRef}>
         <div className="lp-hero-inner">
-          <div className="lp-badge reveal">AI-powered CV analysis</div>
+          <div className="lp-hero-split">
 
-          <h1 className="lp-headline reveal">
-            Your CV has a score.<br />
-            <span className="lp-headline-accent">Do you know it?</span>
-          </h1>
+            {/* Left side — text */}
+            <div className="lp-hero-left">
+              <div className="lp-badge reveal">AI-powered CV analysis</div>
 
-          <p className="lp-subheadline reveal">
-            Paste your CV and a job description. In seconds, get a match score,
-            a precise gap analysis, and a fully rewritten CV tailored to that job.
-          </p>
+              <h1 className="lp-headline reveal">
+                Your CV has a score.<br />
+                <span className="lp-headline-accent">Do you know it?</span>
+              </h1>
 
-          <div className="lp-hero-actions reveal">
-            <button className="lp-cta-primary" onClick={onGetStarted}>
-              Analyze my CV — it's free
-            </button>
-            <span className="lp-cta-note">3 free analyses. No credit card.</span>
-          </div>
+              <p className="lp-subheadline reveal">
+                Paste your CV and a job description. In seconds, get a match score,
+                a precise gap analysis, and a fully rewritten CV tailored to that job.
+              </p>
 
-          {/* Score preview card */}
-          <div className="lp-preview reveal">
-            <div className="lp-preview-card">
-              <div className="lp-preview-top">
-                <span className="lp-preview-label">Match Score</span>
-                <span className="lp-preview-badge weak">Weak match</span>
-              </div>
-              <div className="lp-preview-score">34</div>
-              <div className="lp-preview-bar">
-                <div className="lp-preview-bar-fill" style={{ width: "34%" }} />
-              </div>
-              <div className="lp-preview-tags">
-                <span className="lp-tag missing">Python</span>
-                <span className="lp-tag missing">Docker</span>
-                <span className="lp-tag missing">Bac+5</span>
-                <span className="lp-tag missing">CI/CD</span>
-              </div>
-              <div className="lp-preview-optimized">
-                <span className="lp-preview-optimized-label">Optimized CV ready</span>
-                <span className="lp-preview-optimized-dot" />
+              <div className="lp-hero-actions reveal">
+                <button className="lp-cta-primary" onClick={onGetStarted}>
+                  Analyze my CV — it's free
+                </button>
+                <span className="lp-cta-note">3 free analyses. No credit card.</span>
               </div>
             </div>
-            <div className="lp-preview-glow" />
+
+            {/* Right side — animated card */}
+            <div className="lp-hero-right reveal">
+              <ScoreCard />
+            </div>
+
           </div>
         </div>
 
