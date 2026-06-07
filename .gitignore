@@ -48,3 +48,5 @@ cvmatch-frontend/dist/
 cvmatch-frontend/dist-ssr/
 cvmatch-frontend/*.local
 cvmatch-frontend/.vite/
+
+analyzer/prompts/
