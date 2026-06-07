@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import "../styles/components/ScoreCard.css";
 
-const TAGS = ["Python", "Docker", "Bac+5", "CI/CD"];
-const TAGS_GOOD = ["Python", "Docker", "Bac+5", "CI/CD"];
+const TAGS_BEFORE = [
+  "Python",
+  "Docker",
+  "Bac+3 (ongoing)",
+  "devops",
+];
 
-const PHASES = ["before", "analyzing", "after"];
+const TAGS_AFTER = [
+  "Backend scripts",
+  "Containerization",
+  "Bac+5 Pathway",
+  "Jenkins Pipelines",
+];
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -15,10 +24,9 @@ export default function ScoreCard() {
   const [phase, setPhase] = useState("before");
   const [progress, setProgress] = useState(0);
   const [progressLabel, setProgressLabel] = useState("Waiting...");
-  const [tagStates, setTagStates] = useState(TAGS.map(() => "bad"));
-  const [tagVisible, setTagVisible] = useState(TAGS.map(() => true));
+  const [tagStates, setTagStates] = useState(TAGS_BEFORE.map(() => "bad"));
+  const [tagVisible, setTagVisible] = useState(TAGS_BEFORE.map(() => true));
   const [cvReady, setCvReady] = useState(false);
-  const running = useRef(false);
 
   const getScoreColor = (s) => {
     if (s >= 70) return { num: "#3B6D11", bar: "#639922", badge: "#EAF3DE", badgeText: "#3B6D11", label: "Strong match" };
@@ -36,8 +44,8 @@ export default function ScoreCard() {
         setPhase("before");
         setProgress(0);
         setProgressLabel("Waiting...");
-        setTagStates(TAGS.map(() => "bad"));
-        setTagVisible(TAGS.map(() => true));
+        setTagStates(TAGS_BEFORE.map(() => "bad"));
+        setTagVisible(TAGS_BEFORE.map(() => true));
         setCvReady(false);
 
         await sleep(1800);
@@ -46,15 +54,13 @@ export default function ScoreCard() {
         // phase: analyzing
         setPhase("analyzing");
 
-        // progress bar
         const animateProgress = async (from, to, dur, label) => {
           setProgressLabel(label);
           const steps = 30;
           const stepDur = dur / steps;
           for (let i = 0; i <= steps; i++) {
             if (cancelled) return;
-            const pct = from + (to - from) * (i / steps);
-            setProgress(Math.round(pct));
+            setProgress(Math.round(from + (to - from) * (i / steps)));
             await sleep(stepDur);
           }
         };
@@ -65,27 +71,26 @@ export default function ScoreCard() {
         if (cancelled) break;
         await sleep(400);
 
-        // phase: after — flip tags
+        // phase: after — flip tags one by one
         setPhase("after");
         setProgressLabel("CV optimized");
 
-        for (let i = 0; i < TAGS.length; i++) {
+        for (let i = 0; i < TAGS_BEFORE.length; i++) {
           if (cancelled) break;
           setTagVisible((prev) => prev.map((v, idx) => (idx === i ? false : v)));
-          await sleep(180);
+          await sleep(200);
           setTagStates((prev) => prev.map((s, idx) => (idx === i ? "good" : s)));
           setTagVisible((prev) => prev.map((v, idx) => (idx === i ? true : v)));
-          await sleep(200);
+          await sleep(220);
         }
 
-        // animate score
+        // animate score climbing
         const animateScore = async (from, to, dur) => {
           const steps = 40;
           const stepDur = dur / steps;
           for (let i = 0; i <= steps; i++) {
             if (cancelled) return;
-            const val = Math.round(from + (to - from) * (i / steps));
-            setScore(val);
+            setScore(Math.round(from + (to - from) * (i / steps)));
             await sleep(stepDur);
           }
         };
@@ -97,7 +102,7 @@ export default function ScoreCard() {
         await sleep(2800);
 
         // fade out tags before reset
-        for (let i = TAGS.length - 1; i >= 0; i--) {
+        for (let i = TAGS_BEFORE.length - 1; i >= 0; i--) {
           if (cancelled) break;
           setTagVisible((prev) => prev.map((v, idx) => (idx === i ? false : v)));
           await sleep(80);
@@ -133,19 +138,16 @@ export default function ScoreCard() {
         </div>
 
         <div className="sc-bar-track">
-          <div
-            className="sc-bar-fill"
-            style={{ width: `${score}%`, background: colors.bar }}
-          />
+          <div className="sc-bar-fill" style={{ width: `${score}%`, background: colors.bar }} />
         </div>
 
         <div className="sc-tags">
-          {TAGS.map((tag, i) => (
+          {TAGS_BEFORE.map((_, i) => (
             <span
-              key={tag}
+              key={i}
               className={`sc-tag sc-tag-${tagStates[i]} ${tagVisible[i] ? "sc-tag-visible" : "sc-tag-hidden"}`}
             >
-              {tagStates[i] === "good" ? `${TAGS_GOOD[i]} \u2713` : tag}
+              {tagStates[i] === "good" ? TAGS_AFTER[i] : TAGS_BEFORE[i]}
             </span>
           ))}
         </div>
