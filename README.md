@@ -28,3 +28,6 @@ An AI-powered CV analyzer that scores your CV against any job description, ident
 | Free | 3 |
 | Pro — $5 one-time | Unlimited |
 
+## Note
+
+The AI scoring engine that powers the analysis is proprietary and not included in this public repository. The codebase is fully functional but requires the engine to be configured separately to run.
