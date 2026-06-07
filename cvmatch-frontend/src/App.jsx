@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import InputForm from "./components/InputForm";
 import ResultPage from "./components/ResultPage";
 import AuthPage from "./components/AuthPage";
+import LandingPage from "./components/LandingPage";
 import api from "./api/axios";
 import useAuth from "./hooks/useAuth";
 
 export default function App() {
   const { token, user, setUser, login, logout } = useAuth();
-  // keep local setters for compatibility
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showAuth, setShowAuth] = useState(false);
 
-  // App-level logout should also clear result state
-  const appLogout = () => { logout(); setResult(null); };
+  const appLogout = () => { logout(); setResult(null); setShowAuth(false); };
 
   const analyzeCV = async (cv, jobDescription) => {
     setLoading(true);
@@ -33,22 +33,31 @@ export default function App() {
     }
   };
 
-  const reset = () => {
-    setResult(null);
-    setError(null);
-  };
+  const reset = () => { setResult(null); setError(null); };
 
-  if (!token) return <AuthPage onLogin={login} />;
+  // 1. Not logged in + not asking for auth → Landing page
+  if (!token && !showAuth) {
+    return <LandingPage onGetStarted={() => setShowAuth(true)} />;
+  }
 
-  if (result) return <ResultPage result={result} onReset={reset} onLogout={logout} user={user} />;
+  // 2. Not logged in + clicked Get Started → Auth page
+  if (!token && showAuth) {
+    return <AuthPage onLogin={login} />;
+  }
 
+  // 3. Logged in + has result → Result page
+  if (result) {
+    return <ResultPage result={result} onReset={reset} onLogout={appLogout} user={user} />;
+  }
+
+  // 4. Logged in → Input form
   return (
     <InputForm
       onSubmit={analyzeCV}
       loading={loading}
       error={error}
       user={user}
-      onLogout={logout}
+      onLogout={appLogout}
     />
   );
 }
